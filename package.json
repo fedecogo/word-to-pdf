@@ -1,11 +1,9 @@
 {
   "dependencies": {
     "docxtemplater": "^3.50.0",
-    "fs": "^0.0.1-security",
-    "mammoth": "^1.8.0",
-    "path": "^0.12.7",
-    "pizzip": "^3.1.7",
-    "puppeteer": "^23.5.0"
+    "libreoffice": "^0.4.5",
+    "libreoffice-convert": "^1.6.0",
+    "pizzip": "^3.1.7"
   },
   "name": "word-to-pdf",
   "version": "1.0.0",

@@ -1,77 +1,87 @@
-// Importa le librerie necessarie
 const Docxtemplater = require("docxtemplater");
 const PizZip = require("pizzip");
 const fs = require("fs");
-const path = require("path"); 
-const mammoth = require("mammoth");
-const puppeteer = require("puppeteer");
+const path = require("path");
+const libre = require("libreoffice-convert"); // Per convertire con LibreOffice
 
-// Carica il file 
+// Carica il file .docx
 const content = fs.readFileSync(
     path.resolve(__dirname, "input.docx"),
-    "binary" // Leggi il file come contenuto binario
+    "binary"
 );
 
-// Decompatta il file
+// Decompatta il file .docx
 const zip = new PizZip(content);
 
-// Analizza il template. 
+// Analizza il template
 const doc = new Docxtemplater(zip, {
-    paragraphLoop: true, // Permette di iterare sui paragrafi
-    linebreaks: true,    // Gestisce i ritorni a capo
+    paragraphLoop: true,
+    linebreaks: true,
 });
 
-// Render del documento sostituendo i segnaposto con i valori forniti
+// Sostituisce i segnaposto con i valori forniti
 doc.render({
-    first_name: "Mario",
-    last_name: "Rossi",
+   // subscription.user.name
+   first_name: "Mario",
+   // subscription.user.surname
+   last_name: "Rossi",
+   // subscription.user.tax_code
+   tax_code: "11111111111",
+  
+  // subscription.registry.surname
+   register_surname: "Verdi",
+
+   // subscription.registry.name
+   register_name: "Giuseppe",
+
+   // subscription.registry.birth_address.country_of_birth.name
+   register_birth_country: "Italia",
+
+   // subscription.registry.date_birth
+   register_date_birth: "01/01/2000",
+
+   // subscription.registry.tax_id_code
+   register_tax_code: "222222",
+
+   // subscription.registry.address.city.name
+   register_city: "Roma",
+
+   // subscription.registry.address.province.id
+   register_province: "RO",
+
+   // subscription.registry.address.street
+   register_street: "Via del Corso", 
+
+   // subscription.registry.address.street_number
+   register_street_number: "1",
 });
 
-// Ottiene il documento come un file zip (i docx sono file compressi)
-// e lo genera come un buffer di Node.js e scrive il buffer Node.js in un file DOCX
+// Genera il documento come un buffer e salva il .docx
 const buf = doc.getZip().generate({
-    type: "nodebuffer",  // Tipo di output come buffer Node.js
-    compression: "DEFLATE", // Applica la compressione per ridurre le dimensioni del file
+    type: "nodebuffer",
+    compression: "DEFLATE",
 });
+
 const docxPath = path.resolve(__dirname, "output.docx");
-fs.writeFileSync(docxPath, buf); // Salva il file DOCX generato
+fs.writeFileSync(docxPath, buf); // Salva il file .docx generato
 
-
-// Funzione per convertire un file .docx in HTML utilizzando Mammoth
-async function convertDocxToHtml(docxPath) {
-    const result = await mammoth.convertToHtml({ path: docxPath }); // Converte in HTML
-    return result.value; // Ritorna la stringa HTML
-}
-
-// Funzione per convertire HTML in PDF utilizzando Puppeteer
-async function convertHtmlToPdf(html, pdfPath) {
-    const browser = await puppeteer.launch(); // Avvia il browser headless
-    const page = await browser.newPage(); // Crea una nuova pagina
-    
-    // Carica l'HTML nel browser headless
-    await page.setContent(html, { waitUntil: "domcontentloaded" });
-    
-    // Genera il PDF dal contenuto HTML
-    await page.pdf({
-        path: pdfPath,        // Percorso di salvataggio del PDF
-        format: "A4",        // Formato del PDF
-        printBackground: true, // Stampa anche lo sfondo
-    });
-    
-    await browser.close(); // Chiude il browser
-}
-
-// Funzione principale per gestire la conversione da .docx a .pdf
+// Funzione per convertire un file .docx in PDF utilizzando LibreOffice-convert
 async function convertDocxToPdf(docxPath) {
-    const pdfPath = path.resolve(__dirname, "output.pdf"); // Percorso di salvataggio del PDF
-    try {
-        const html = await convertDocxToHtml(docxPath); // Converte DOCX in HTML
-        await convertHtmlToPdf(html, pdfPath); // Converte HTML in PDF
-        console.log(`File PDF salvato in: ${pdfPath}`); // Messaggio di conferma
-    } catch (error) {
-        console.error("Errore durante la conversione:", error); // Gestione degli errori
-    }
+    const pdfPath = path.resolve(__dirname, "output.pdf"); // Percorso di output PDF
+    const docxBuffer = fs.readFileSync(docxPath); // Leggi il file .docx
+
+    // Esegui la conversione usando libreoffice-convert
+    libre.convert(docxBuffer, '.pdf', undefined, (err, pdfBuffer) => {
+        if (err) {
+            console.error(`Errore durante la conversione: ${err.message}`);
+            return;
+        }
+
+        // Salva il buffer PDF in un file
+        fs.writeFileSync(pdfPath, pdfBuffer);
+        console.log(`File PDF salvato in: ${pdfPath}`);
+    });
 }
 
-// Avvia la conversione da DOCX a PDF
+// Avvia la conversione da .docx a PDF
 convertDocxToPdf(docxPath);
