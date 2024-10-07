@@ -21,7 +21,7 @@ const doc = new Docxtemplater(zip, {
     linebreaks: true,    // Gestisce i ritorni a capo
 });
 
-// Rende il documento sostituendo i segnaposto con i valori forniti
+// Render del documento sostituendo i segnaposto con i valori forniti
 doc.render({
     first_name: "Mario",
     last_name: "Rossi",
