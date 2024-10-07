@@ -25,8 +25,6 @@ const doc = new Docxtemplater(zip, {
 doc.render({
     first_name: "Mario",
     last_name: "Rossi",
-    phone: "+33312345678",
-    description: "Infooo",
 });
 
 // Ottiene il documento come un file zip (i docx sono file compressi)
