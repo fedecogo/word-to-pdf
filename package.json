@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "docxtemplater": "^3.50.0",
+    "fs": "^0.0.1-security",
+    "mammoth": "^1.8.0",
+    "path": "^0.12.7",
+    "pizzip": "^3.1.7",
+    "puppeteer": "^23.5.0"
+  },
+  "name": "word-to-pdf",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
